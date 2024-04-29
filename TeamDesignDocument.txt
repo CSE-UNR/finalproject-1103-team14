@@ -1,4 +1,4 @@
 Image Processing Team Design Document
-Names: Victor Dang, 
+Names: Victor Dang, Verenice Acosta 
 
-
+hello worlds
