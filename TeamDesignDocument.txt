@@ -1,4 +1,14 @@
 Image Processing Team Design Document
 Names: Victor Dang, Verenice Acosta 
 
-hello worlds
+Functions:
+main()
+Functionality: Prompt menu then display the image modfication chosen for the user's image and either save it to a file or display it to the screen. Then it will return back to the start menu. 
+
+copyFileImage()
+Input parameters: 2D array, rows and columns, file pointer
+Functionality: This will copy/write the contents of the given file to the 2D array into the main function.
+
+displayFileImage()
+Input parameters: 2D array, rows and columns
+Functionality: This will display the 
