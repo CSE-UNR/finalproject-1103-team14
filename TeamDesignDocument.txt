@@ -6,9 +6,52 @@ main()
 Functionality: Prompt menu then display the image modfication chosen for the user's image and either save it to a file or display it to the screen. Then it will return back to the start menu. 
 
 copyFileImage()
-Input parameters: 2D array, rows and columns, file pointer
+Input Parameters: 2D char array, int rows and int columns, file pointer
 Functionality: This will copy/write the contents of the given file to the 2D array into the main function.
 
 displayFileImage()
-Input parameters: 2D array, rows and columns
-Functionality: This will display the 
+Input Parameters: 2D char array, int rows and int columns
+Functionality: This will display the the contents of the copied image onto the screen 
+
+DisplayGeneralMenuOptions()
+Input Parameters - nothing
+Output - nothing
+Functionality - the function will display all the general options to the user such as loading, and
+displaying an image, editing the image, and exiting the program
+
+DisplayEditMenuOptions()
+Input Parameters - nothing
+Output - nothing
+Functionality - the function will display all the possible image modifications to a user’s chosen
+image
+
+GetMenuOptions()
+Input Parameters - int input
+Output - return the same integer input entered into the function
+Functionality - the function will return back what was inputted into it when the user chooses a
+specific menu option
+
+CropImage()
+Input Parameters - original 2D char array, int width, int height, output 2D char array, int newWidth, int newHeight
+Output - nothing
+Functionality - the program will attempt to crop the 2D array image to custom new dimensions
+and save it to a new array
+
+DimImage()
+Input Parameters - original 2D char array, int width, int height, output 2D char array
+Output - nothing
+Functionality - the program will attempt to dim every pixel in a given 2D array image and save it
+to a new array
+
+BrightenImage()
+Input Parameters - original 2D char array, int width, int height, output 2D char array
+Output - nothing
+Functionality - the program will attempt to brighten every pixel in a given 2D array image and
+save it to a new array
+
+SaveFileImage()
+Input Parameters - 2D char array, int width, int height, output file pointer
+Output - nothing
+Functionality - the function will attempt to save a modified 2D char array image to a custom file
+name chosen by the user
+
