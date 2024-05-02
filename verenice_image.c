@@ -1,99 +1,123 @@
-//Author:Verenice Acosta
+//Author: Verenice Acosta 
+//Menu selections for image project 
 
-#include <stdio.h>
+#include <stdio.h> 
 
-void displayGeneralMenuOptions();
-void displayEditMenuOptions();
-int getGeneralMenuChoice();
-int getEditMenuChoice();
+#define ROWS 100 
+#define COLUMNS 100
+int getGeneralMenuOptions(); 
+int getEditMenuOptions(); 
+int dimImage(int width, int height, int image[][height]); 
+char saveFileImageChoice();
 
-int main(){
-	
-	int generalMenuChoice, editMenuChoice;
-	
-	do{
-		displayGeneralMenuOptions();
-		
-		generalMenuChoice = getGeneralMenuChoice();
-		
-		if(generalMenuChoice == 1){
+int main(){ 
+
+	int generalMenuChoice, editMenuChoice, image[ROWS][COLUMNS]; 
+	char saveYesNo; 
+
+	do{ 
+
+		generalMenuChoice = getGeneralMenuOptions(); 
+
+		if(generalMenuChoice == 1){ 
+			printf("What is the name of the image file? "); 
+			//add the file scanning part here 
+			//if file exists will give a success message if fails gives error message and sends to main menu and all the other options will print
 			printf("\n");
-			printf("Enter the name of your file: ");
-			// will scan name here
-			printf("\n");
+		} 
+
+		else if(generalMenuChoice == 2){ 
+			printf("\n"); 
+			//add display image 
 		}
-		else if(generalMenuChoice == 2){
-			printf("\n");
-			printf("Here is your current image!\n");
-		}
-		else if(generalMenuChoice == 3){
-			printf("\n");
-			
-			displayEditMenuOptions();
-			
-			editMenuChoice = getEditMenuChoice();
-			
-			if(editMenuChoice == 1){
-				printf("\n");
-				printf("Enter the width and length you would like to crop it to: ");
-				printf("\n");
-				// scanf the new elements of the 2D array
-			}
-			if(editMenuChoice == 2){
-				printf("\n");
-				printf("Here is your new dimmed image.");
-				printf("\n");
-				// display image here
-			}
-			if(editMenuChoice == 3){
-				printf("\n");
-				printf("Here is your new brightened image.");
-				// display
-				printf("\n");
-			}
-		
-		
-		}	
-		
-	}while(generalMenuChoice != 4);
 
-	return 0;
-}
+		else if(generalMenuChoice == 3){ 
+			editMenuChoice = getEditMenuOptions(); 
 
-void displayGeneralMenuOptions(){
+			if(editMenuChoice == 1){ 
+				printf("\n"); 
+				printf("The image you want to crop is \n"); 
+				// add the 2D array values here
+				printf("The row and column values start in the upper lefthand corner.\n");
+				printf("\nWhich column do you want to be the new left side? ");
+				//scanf(" %d", &leftCol);
+				printf("\n\nWhich column do you want to be the right left side? ");
+				//scanf 2D array value here
+				printf("\n\nWhich row do you want to be the new top? ");
+				//scanf
+				printf("\n\nWhich row do you want to be the new bottom? ");
+				//scanf
+				//display new image
+				printf("\n");
+				saveYesNo = saveFileImageChoice();
+ 				
+			} 
 
-	printf("\n**Image Processor**\n");
-	printf("1. Load new image\n");
-	printf("2. Display current image\n");
-	printf("3. Edit current image\n");
-	printf("4. Exit program\n");
-}
+			else if(editMenuChoice == 2){ 
+				//display image 
+        saveYesNo = saveFileImageChoice();
 
-int getGeneralMenuChoice(){
+			} 
+
+      else if(editMenuChoice == 3){
+        //display image
+        saveYesNo = saveFileImageChoice();
+        
+      }
+		} 
+		else if(editMenuChoice == 0){ 
+			printf("\nGoodbye!\n\n"); 
+		} 
+	}while(generalMenuChoice != 0); 
+
+	return 0; 
+} 
+
+int getGeneralMenuOptions(){ 
 	int userChoice1;
-	
-	printf("Enter the number of your choice: ");
+	printf("**ERINSTAGRAM**\n"); 
+	printf("1. Load image\n"); 
+	printf("2. Display image\n"); 
+	printf("3. Edit image\n"); 
+	printf("0. Exit\n"); 
+	printf("\nChoose from one of the options above: ");
 	scanf(" %d", &userChoice1);
-	
+
 	return userChoice1;
-}
+} 
 
-void displayEditMenuOptions(){
-	
-	printf("How would you like to edit your image?\n");
-	printf("1. Crop image\n");
-	printf("2. Dim image\n");
-	printf("3. Brighten image\n");
-	
-}
-
-int getEditMenuChoice(){
-	int userChoice2;
-	
-	printf("Enter the number of your choice: ");
+int getEditMenuOptions(){ 
+  	int userChoice2;
+	printf("\n\n");
+  	printf("**EDITING**\n"); 
+	printf("1. Crop image\n"); 
+	printf("2. Dim image\n"); 
+	printf("3. Brighten image\n"); 
+	printf("0. Return to main menu\n"); 
+	printf("\nChoose from one of the options above: ");
 	scanf(" %d", &userChoice2);
-	
+
 	return userChoice2;
+} 
+
+
+char saveFileImageChoice(){
+  	char saveOption;
+
+	printf("Would you like to save the file? (y/n) "); 
+	scanf(" %c", &saveOption); 
+	printf("\n"); 
+	switch(saveOption){ 
+		case 'Y': 
+		case 'y': 
+			printf("What do you want to name the image file? (include the extension) "); 
+			//scanf of the new file name 
+			printf("\nImage successfully loaded!\n\n"); 
+			break; 
+		case 'N': 
+		case 'n': 
+		break; 
+	} 
+        
+        return saveOption;
 }
-
-
