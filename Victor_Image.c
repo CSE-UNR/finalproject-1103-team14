@@ -9,7 +9,7 @@
 void grabImageDimensions(int* widthPointer, int* heightPointer,FILE* inputFilePointer, char fileName[]);
 void displayFileImage(FILE* inputFilePointer, char fileName[]);
 void copyFileImage(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]);
-
+void test(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]);
 int main() {
 	//Image to load for testing: TestImage.txt or TestImage2.txt
 
@@ -50,7 +50,7 @@ int main() {
 	char copiedImage[originalWidth][originalHeight];
 	
 	copyFileImage(originalWidth, originalHeight, copiedImage, userFilePointer, inputFileName);
-	
+	test(originalWidth, originalHeight, copiedImage, userFilePointer, inputFileName);
 	
 	return 0;
 }
@@ -81,8 +81,8 @@ void grabImageDimensions(int* widthPointer, int* heightPointer, FILE* inputFileP
 	*heightPointer = height;
 	*widthPointer = width; 
 	 
-	//Debugging printf("\nTotal: %d", total); 
-	//Debugging printf("\nWidth: %d", width); 
+	printf("\nTotal: %d", total); 
+	printf("\nWidth: %d", width); 
 	//Debugging printf("\nHeight: %d\n", height); 
 	
 	fclose(inputFilePointer);
@@ -128,6 +128,21 @@ void copyFileImage(int width, int height, char array[width][height], FILE* input
 	
 	fclose(inputFilePointer);
 
+}
+
+void test(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]) {
+	int count = 0; //Debugging
+	char letter;
+	
+	inputFilePointer = fopen(fileName, "r");
+	for (int widthIndex=0; widthIndex<width+1; widthIndex++) {
+		for (int heightIndex=0; heightIndex<height; heightIndex++) {
+			fscanf(inputFilePointer, "%c", &letter);
+			if (letter == ' '){
+				array[widthIndex][heightIndex] = '.';
+			}
+		}
+		}
 }
 
 void saveFileImage(FILE* outputFilePointer, char fileName[]) {
