@@ -4,19 +4,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define STR_CAP 75
+#define FILENAMECAP 75
 
 void grabImageDimensions(int* widthPointer, int* heightPointer,FILE* inputFilePointer, char fileName[]);
 void displayFileImage(FILE* inputFilePointer, char fileName[]);
-
 void copyFileImage(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]);
 
-
 int main() {
-	//Image to load for testing: TestImage.txt
+	//Image to load for testing: TestImage.txt or TestImage2.txt
 
-	char inputFileName[STR_CAP];
-	char originalImage[STR_CAP][STR_CAP];
+	char inputFileName[FILENAMECAP];
 	int originalWidth = 0;
 	int originalHeight = 0; 
 	
@@ -25,32 +22,35 @@ int main() {
 	FILE* userFilePointer;
 	
 	//Load User Image 
-	printf("Enter file to load (without .txt at): ");
-	fgets(inputFileName, STR_CAP, stdin);
+	
+	printf("Enter file to load: ");
+	fgets(inputFileName, FILENAMECAP, stdin);
 	
 	for (int letter=0; inputFileName[letter] != '\0'; letter++) {
 		endIndex = letter;
 	}
-	
-	inputFileName[endIndex] = '.';
-	inputFileName[endIndex+1] = 't';
-	inputFileName[endIndex+2] = 'x';
-	inputFileName[endIndex+3] = 't';
+	inputFileName[endIndex] = inputFileName[endIndex+1];
 	
 	userFilePointer = fopen(inputFileName, "r");
 	
+	//Exit program if file couldn't be loaded in. 
 	if (userFilePointer == NULL) {
-		printf("Image couldn't be loaded succesfully. Goodbye. \n");
+		printf("Image couldn't be loaded succesfully.\n");
+		printf("Returning back to first menu.\n");
 		return 0;
 	}
 	
+	printf("\nImage loaded successfully.\n");
 	fclose(userFilePointer);
 	
-	//Grab File Dimensions, Display File to Screen 
+	displayFileImage(userFilePointer, inputFileName);
+	
+	//Copy contents of file into copiedImage array after calculating image dimensions
 	grabImageDimensions(&originalWidth, &originalHeight, userFilePointer, inputFileName);
 	char copiedImage[originalWidth][originalHeight];
 	
-	displayFileImage(userFilePointer, inputFileName);
+	copyFileImage(originalWidth, originalHeight, copiedImage, userFilePointer, inputFileName);
+	
 	
 	return 0;
 }
@@ -61,83 +61,83 @@ void grabImageDimensions(int* widthPointer, int* heightPointer, FILE* inputFileP
 	int height;
 	int width;
 	
-	int total = 0;
-	
-	int BrightnessZero = 0;
-	int BrightnessOne = 0;
-	int BrightnessTwo = 0;
-	int BrightnessThree = 0;
-	int BrightnessFour = 0;
+	int total = 0; // Stores all possible characters in file's contents INCLUDING endlines
+	int allValidPixels = 0; // Stores all possible characters in file's contents EXCLUDING endlines
 	
 	inputFilePointer = fopen(fileName, "r");
 	
-	if (inputFilePointer == NULL) {
-		printf("File couldn't be loaded successfully. Goodbye. \n");
-	}
 	
 	while (fscanf(inputFilePointer, "%c", &letter) == 1) {
-		if (letter == ' ') {
-			BrightnessZero++;
-		} else if (letter == '.') {
-			BrightnessOne++;
-		} else if (letter == 'o') {
-			BrightnessTwo++;
-		} else if (letter == 'O') {
-			BrightnessThree++;
-		} else if (letter == '0') {
-			BrightnessFour++;
+		if (letter == ' ' || letter == '.' || letter == 'o' || letter == 'O' || letter == '0') {
+			allValidPixels++;
 		}
-	
 		total++;	
 	} 
 	
-	height = total - (BrightnessZero + BrightnessOne + BrightnessTwo + BrightnessThree + BrightnessFour);
+	//Calculates width and height and assigned to their respective pointers to declare copiedImage[] in main
+	height = total - allValidPixels;
 	width = (total-height) / height;
 	
 	*heightPointer = height;
 	*widthPointer = width; 
-	
-	/*
-	printf("\nThe height of the image is %d. ", height);
-	printf("\nThe width of the image is %d. ", width);
-	
-	printf("\nRead %d Brightness 0(  ) characters in image.", BrightnessZero);
-	printf("\nRead %d Brightness 1( . ) characters in image.", BrightnessOne);
-	printf("\nRead %d Brightness 2( o ) characters in image.", BrightnessTwo);
-	printf("\nRead %d Brightness 3( O ) characters in image.", BrightnessThree);
-	printf("\nRead %d Brightness 4( 0 ) characters in image.", BrightnessFour);
-	printf("\nRead %d total letters in image including endlines and %d without.", total, (total-height)); */
+	 
+	//Debugging printf("\nTotal: %d", total); 
+	//Debugging printf("\nWidth: %d", width); 
+	//Debugging printf("\nHeight: %d\n", height); 
 	
 	fclose(inputFilePointer);
 	
-	printf("Successfully Loaded Image\n");
 }
 
 void displayFileImage(FILE* inputFilePointer, char fileName[]) {
 	char letter;
+	int count = 0; //Debugging
+	
 	inputFilePointer = fopen(fileName, "r");
 	
-	if (inputFilePointer == NULL) {
-		printf("File couldn't be loaded successfully. Goodbye. \n");
-	}
-	
+	//Displays each letter in file's contents
 	while (fscanf(inputFilePointer, "%c", &letter) == 1) {
+		count++;
 		printf("%c", letter);
 	}
+	
+	printf("ORIGINAL IMAGE DISPLAY DONE. ^^^^ \n"); //Debugging
+	printf("Total Characters: %d\n", count); //Debugging
 	
 	fclose(inputFilePointer);
 }
 
 void copyFileImage(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]) {
-
-
+	int count = 0; //Debugging
 	
+	inputFilePointer = fopen(fileName, "r");
 
+	//Copies the file's contents into array pointer.
+	// +1 in for loop accounts for endlines
+	for (int widthIndex=0; widthIndex<width+1; widthIndex++) {
+		for (int heightIndex=0; heightIndex<height; heightIndex++) {
+			count++; //Debugging
+			fscanf(inputFilePointer, "%c", &array[widthIndex][heightIndex]);
+			
+			//Debugging printf("%c", array[widthIndex][heightIndex]); 
+		}
+	}
+	
+	//Debugging printf("COPIED IMAGE DISPLAY FROM ARRAY DONE ^^^^ \n"); 
+	//Debugging printf("Total Characters: %d\n", count); 
+	
+	fclose(inputFilePointer);
 
 }
 
+void saveFileImage(FILE* outputFilePointer, char fileName[]) {
+	
+}
 
-
+//need edited image to allow for functionality of the save 
+//need invalid check for invalid file that doesn't exist > return to first menu
+//need invalid check for invalid rows and columns for cropping > reprompt for valid rows and columns
+//need invalid check for invalid option > exit program entirely 
 
 
 
