@@ -10,33 +10,38 @@
 
 int getGeneralMenuOptions(); 
 int getEditMenuOptions();  
+char getSaveChoice();
 
-
+void cropImage(char array[ROWS][COLUMNS], int width, int height, int* newWidthPointer, int* newHeightPointer);
+void brightenImage(char array[ROWS][COLUMNS], int width, int height);
 void dimImage(char copiedImage[ROWS][COLUMNS], int width, int height);
 
 void grabImageDimensions(int* widthPointer, int* heightPointer,FILE* inputFilePointer, char fileName[]);
-
 void displayFileImage(FILE* inputFilePointer, char fileName[]);
-
 void copyFileImage(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]);
-
+void saveFileImage(char array[ROWS][COLUMNS], int width, int height, FILE* outputFilePointer);
 
 int main() {
-	int generalMenuChoice, editMenuChoice, widthIndex, heightIndex, originalWidth = 0, originalHeight = 0, endIndex; 
+	int generalMenuChoice, editMenuChoice;
+	int widthIndex, heightIndex, originalWidth = 0, originalHeight = 0, endIndex; 
+	
 	char saveYesNo;
-	char copiedImage[COLUMNS][ROWS];
-	char inputFileName[FILENAMECAP];
+	char copiedImage[COLUMNS][ROWS], inputFileName[FILENAMECAP];
+	
 	FILE* userFilePointer;
+	
+	char buffer;
 	
 	do{ 
 		
 		generalMenuChoice = getGeneralMenuOptions(); 
 
 		if(generalMenuChoice == 1){ //LOADING IMAGE
-			char buffer;
+			
 			scanf("%c", &buffer);
 			
-			printf("What is the name of the image file? "); 
+			//Load the file the user wants to use
+			printf("What is the name of the image file? (with .txt) "); 
 			fgets(inputFileName, FILENAMECAP, stdin);
 			
 			
@@ -57,17 +62,7 @@ int main() {
 			
 			//Copy contents of file into copiedImage array after calculating image dimensions
 			grabImageDimensions(&originalWidth, &originalHeight, userFilePointer, inputFileName);
-
 			copyFileImage(originalWidth, originalHeight, copiedImage, userFilePointer, inputFileName);
-			printf("\nBegin printing from array\n");
-			
-			for (int i =0; i<originalHeight; i++) {
-				for (int j=0; j<originalWidth+1;j++) {
-					printf("%c", copiedImage[i][j]);
-				}
-			}
-			
-			printf("end\n\n");
 			
 			
 		} else if(generalMenuChoice == 2){ //DISPLAYING IMAGE
@@ -78,15 +73,42 @@ int main() {
 			editMenuChoice = getEditMenuOptions(); 
 
 			if(editMenuChoice == 1){ //CROPPING IMAGE
+				int croppedWidth;
+				int croppedHeight;
+				
+ 				cropImage(copiedImage, originalWidth, originalHeight, &croppedWidth, &croppedHeight);	
  				
+ 				scanf("%c", &buffer);
+ 				saveYesNo = getSaveChoice();
+ 				
+ 				
+ 				if (saveYesNo == 'Y') {
+ 					//Grab file name user if they want to save 
+	 				scanf("%c", &buffer);
+	 				printf("What is the name of the new file? (with .txt) "); 
+					fgets(inputFileName, FILENAMECAP, stdin);
+					
+					
+					for (int letter=0; inputFileName[letter] != '\0'; letter++) {
+						endIndex = letter;
+					}
+					
+					inputFileName[endIndex] = inputFileName[endIndex+1];
+ 				} else {
+ 					scanf("%c", &buffer);
+ 				}
+ 				
+				
 			} 
 
 			else if(editMenuChoice == 2){ //DIM IMAGE
 				dimImage(copiedImage, originalWidth, originalHeight);
+
 			}
 			
       			else if(editMenuChoice == 3){ //BRIGHTEN IMAGE
-        
+        			brightenImage(copiedImage, originalWidth, originalHeight);
+
       			}
       			
 		} else if(editMenuChoice == 0){ 
@@ -127,38 +149,63 @@ int getEditMenuOptions(){
 	return userChoice2;
 } 
 
-/*
-void cropImage(char array[ROWS][COLUMNS], int width, int height){
-	int leftCol, rightCol, topRow, bottomRow, rowI = width, colI = height;
+char getSaveChoice() {
+	char userChoice3;
 	
+	printf("\nWould you like to save the image to a file? ([Y]es or [N]o? ");
+	scanf("%c", &userChoice3);
+	
+	return userChoice3;
+}
+
+
+void cropImage(char array[ROWS][COLUMNS], int width, int height, int* newWidthPointer, int* newHeightPointer){
+	int leftCol, rightCol, topRow, bottomRow, newRow, newCols;
+	
+	//Displaying the image with # of rows and columns 
+	//Grabbing the user's new dimensions of the image
+	printf("The image you want to crop is %d x %d.\n", height, width);
 	printf("The row and column values start in the upper lefthand corner.\n");
 	printf("\nWhich column do you want to be the new left side? ");
-	scanf(" %d", &leftCol);
-	printf("\n\nWhich column do you want to be the right left side? ");
-	scanf(" %d", &rightCol);
-	printf("\n\nWhich row do you want to be the new top? ");
-	scanf(" %d", &topRow);
-	printf("\n\nWhich row do you want to be the new bottom? ");
-	scanf(" %d", &bottomRow);
+	scanf("%d", &leftCol);
+	while (leftCol < 1 || leftCol > width) {
+		printf("Invalid column. Choose a value between 1 and %d: ", width);
+		scanf("%d", &rightCol);
+	}
 	
-	for(rowI = 0; rowI < topRow; rowI++){
-		for(columnI = 0; columnI < leftCol; columnI++){
-			for(rowI = 0; rowI < bottomRow; rowI++){
-				for(columnI = 0; columnI < rightCol; columnI++){
-					bottomRow - topRow = newRows;
-					rightCol - leftCol = newCols;
-					array[newRows][newCols];
-				}
-			}
+	printf("\nWhich column do you want to be the new right side? ");
+	scanf("%d", &rightCol);
+	while (rightCol <= leftCol || rightCol > width) {
+		printf("Invalid row. Choose a value between %d and %d: ", leftCol, width);
+		scanf("%d", &rightCol);
+	}
+
+	printf("\nWhich row do you want to be the new top? ");
+	scanf("%d", &topRow);
+	while (topRow < 1 || topRow > height) {
+		printf("Invalid row. Choose a value between 1 and %d: ", height);
+		scanf("%d", &rightCol);
+	}
+	
+	printf("\nWhich row do you want to be the new bottom? ");
+	scanf("%d", &bottomRow);
+	while (bottomRow <= topRow || bottomRow > height) {
+		printf("Invalid row. Choose a value between %d and %d: ", topRow, width);
+		scanf("%d", &rightCol);
+	}
+	
+	
+	//Display cropped image
+	for (int heightIndex = topRow-1; heightIndex <= bottomRow-1; heightIndex++) {
+		for(int widthIndex = leftCol-1; widthIndex <= rightCol; widthIndex++){
+			printf("%c", array[heightIndex][widthIndex]);
 		}
 	}
-					
-	//display new image
-	printf("\n");
-}*/
-
-
-
+	
+	*newWidthPointer = rightCol;
+	*newHeightPointer = bottomRow;
+	
+}
 
 void dimImage(char array[ROWS][COLUMNS], int width, int height){
 	for (int heightIndex=0; heightIndex<height; heightIndex++) {
@@ -173,6 +220,26 @@ void dimImage(char array[ROWS][COLUMNS], int width, int height){
 				array[heightIndex][widthIndex] = 'o';
 			} else if (array[heightIndex][widthIndex] == '0') {
 				array[heightIndex][widthIndex] = 'O';
+			}
+			printf("%c", array[heightIndex][widthIndex]);
+		}
+	}
+}
+
+void brightenImage(char array[ROWS][COLUMNS], int width, int height){
+	
+	for (int heightIndex=0; heightIndex<height; heightIndex++) {
+		for (int widthIndex=0; widthIndex<width+1; widthIndex++) {
+			if (array[heightIndex][widthIndex] == '0') {
+				array[heightIndex][widthIndex] = '0';
+			} else if (array[heightIndex][widthIndex] == 'O') {
+				array[heightIndex][widthIndex] = '0';
+			} else if (array[heightIndex][widthIndex] == 'o') {
+				array[heightIndex][widthIndex] = 'O';
+			} else if (array[heightIndex][widthIndex] == '.') {
+				array[heightIndex][widthIndex] = 'o';
+			} else if (array[heightIndex][widthIndex] == ' ') {
+				array[heightIndex][widthIndex] = '.';
 			}
 			printf("%c", array[heightIndex][widthIndex]);
 		}
@@ -223,7 +290,6 @@ void displayFileImage(FILE* inputFilePointer, char fileName[]) {
 }
 
 void copyFileImage(int width, int height, char array[COLUMNS][ROWS], FILE* inputFilePointer, char fileName[]) {
-	int count = 0; //Debugging
 	
 	inputFilePointer = fopen(fileName, "r");
 
@@ -231,16 +297,23 @@ void copyFileImage(int width, int height, char array[COLUMNS][ROWS], FILE* input
 	// +1 in for loop accounts for endlines
 	for (int heightIndex=0; heightIndex<height; heightIndex++) {
 		for (int widthIndex=0; widthIndex<width+1; widthIndex++) {
-			count++; //Debugging
 			fscanf(inputFilePointer, "%c", &array[heightIndex][widthIndex]);
-
-			//printf("%c", array[heightIndex][widthIndex]);
 		}
 		
 	}
 	
 	fclose(inputFilePointer);
-	
-	//printf("COPIED IMAGE DISPLAY FROM ARRAY DONE ^^^^ \n"); Debugging 
-	//printf("Total Characters: %d\n", count); Debugging 
 }
+
+void saveFileImage(char array[ROWS][COLUMNS], int width, int height, FILE* outputFilePointer) {
+	//inputFilePointer = fopen(fileName, "w");
+	
+	
+	
+	
+	
+	
+	//fclose(inputFilePointer);
+}
+
+
