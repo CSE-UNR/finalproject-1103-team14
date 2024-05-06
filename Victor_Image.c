@@ -8,14 +8,17 @@
 #define COLUMNS 1000
 #define FILENAMECAP 75
 
+//Menu Functions
 int getGeneralMenuOptions(); 
 int getEditMenuOptions();  
 char getSaveChoice();
 
-void cropImage(char array[ROWS][COLUMNS], int width, int height, int* newWidthPointer, int* newHeightPointer);
+//Modifying Image Functions
+void cropImage(char array[ROWS][COLUMNS], int width, int height, int* startWidth, int* startHeight, int* newWidthPointer, int* newHeightPointer);
 void brightenImage(char array[ROWS][COLUMNS], int width, int height);
 void dimImage(char copiedImage[ROWS][COLUMNS], int width, int height);
 
+//File Functions
 void grabImageDimensions(int* widthPointer, int* heightPointer,FILE* inputFilePointer, char fileName[]);
 void displayFileImage(FILE* inputFilePointer, char fileName[]);
 void copyFileImage(int width, int height, char array[width][height], FILE* inputFilePointer, char fileName[]);
@@ -40,7 +43,7 @@ int main() {
 			
 			scanf("%c", &buffer);
 			
-			//Load the file the user wants to use
+			//Get file name from user 
 			printf("What is the name of the image file? (with .txt) "); 
 			fgets(inputFileName, FILENAMECAP, stdin);
 			
@@ -50,6 +53,8 @@ int main() {
 			}
 			
 			inputFileName[endIndex] = inputFileName[endIndex+1];
+			
+			//Load file
 			userFilePointer = fopen(inputFileName, "r");
 	
 			if (userFilePointer == NULL) {
@@ -73,42 +78,67 @@ int main() {
 			editMenuChoice = getEditMenuOptions(); 
 
 			if(editMenuChoice == 1){ //CROPPING IMAGE
-				int croppedWidth;
-				int croppedHeight;
+				int startPosWidth, croppedWidth;
+				int startPosHeight, croppedHeight;
 				
- 				cropImage(copiedImage, originalWidth, originalHeight, &croppedWidth, &croppedHeight);	
+ 				cropImage(copiedImage, originalWidth, originalHeight, &startPosWidth, &startPosHeight, &croppedWidth, &croppedHeight);	
  				
  				scanf("%c", &buffer);
  				saveYesNo = getSaveChoice();
  				
- 				
+ 				//Saving edited image to custom file 
  				if (saveYesNo == 'Y') {
- 					//Grab file name user if they want to save 
-	 				scanf("%c", &buffer);
-	 				printf("What is the name of the new file? (with .txt) "); 
-					fgets(inputFileName, FILENAMECAP, stdin);
-					
-					
-					for (int letter=0; inputFileName[letter] != '\0'; letter++) {
+ 					scanf("%c", &buffer);
+
+					//Grab file name 				
+ 					printf("What is the name of the new file? (with .txt) "); 
+ 					fgets(inputFileName, FILENAMECAP, stdin);
+
+ 					
+ 					for (int letter=0; inputFileName[letter] != '\0'; letter++) {
 						endIndex = letter;
 					}
-					
+			
 					inputFileName[endIndex] = inputFileName[endIndex+1];
- 				} else {
- 					scanf("%c", &buffer);
- 				}
+					
+					//Load file and write into it 
+					userFilePointer = fopen(inputFileName, "w");
+					
+					for (int heightIndex = startPosHeight-1; heightIndex <= croppedHeight-1; heightIndex++) {
+						for(int widthIndex = startPosWidth-1; widthIndex <= croppedWidth; widthIndex++){
+							fprintf(userFilePointer, "%c", copiedImage[heightIndex][widthIndex]);
+						}
+					}
+					
+					fclose(userFilePointer);
+ 				} 
  				
 				
 			} 
 
 			else if(editMenuChoice == 2){ //DIM IMAGE
 				dimImage(copiedImage, originalWidth, originalHeight);
-
+				
+				scanf("%c", &buffer);
+ 				saveYesNo = getSaveChoice();
+ 				
+ 				//Saving edited image to custom file 
+ 				if (saveYesNo == 'Y') {
+ 					saveFileImage(copiedImage, originalWidth, originalHeight, userFilePointer); //output: TestOutput.txt
+ 				} 
+				
 			}
 			
       			else if(editMenuChoice == 3){ //BRIGHTEN IMAGE
         			brightenImage(copiedImage, originalWidth, originalHeight);
-
+        			
+				scanf("%c", &buffer);
+ 				saveYesNo = getSaveChoice();
+ 				
+ 				//Saving edited image to custom file 
+ 				if (saveYesNo == 'Y') {
+ 					saveFileImage(copiedImage, originalWidth, originalHeight, userFilePointer); //output: TestOutput.txt
+ 				} 
       			}
       			
 		} else if(editMenuChoice == 0){ 
@@ -152,14 +182,14 @@ int getEditMenuOptions(){
 char getSaveChoice() {
 	char userChoice3;
 	
-	printf("\nWould you like to save the image to a file? ([Y]es or [N]o? ");
+	printf("\nWould you like to save the image to a file? ([Y]es or [N]o?) ");
 	scanf("%c", &userChoice3);
 	
 	return userChoice3;
 }
 
 
-void cropImage(char array[ROWS][COLUMNS], int width, int height, int* newWidthPointer, int* newHeightPointer){
+void cropImage(char array[ROWS][COLUMNS], int width, int height, int* startWidth, int* startHeight, int* newWidthPointer, int* newHeightPointer){
 	int leftCol, rightCol, topRow, bottomRow, newRow, newCols;
 	
 	//Displaying the image with # of rows and columns 
@@ -202,7 +232,9 @@ void cropImage(char array[ROWS][COLUMNS], int width, int height, int* newWidthPo
 		}
 	}
 	
+	*startWidth = leftCol;
 	*newWidthPointer = rightCol;
+	*startHeight = topRow;
 	*newHeightPointer = bottomRow;
 	
 }
@@ -306,14 +338,31 @@ void copyFileImage(int width, int height, char array[COLUMNS][ROWS], FILE* input
 }
 
 void saveFileImage(char array[ROWS][COLUMNS], int width, int height, FILE* outputFilePointer) {
-	//inputFilePointer = fopen(fileName, "w");
+	char inputBuffer;
+	char userFileName[FILENAMECAP];
+	int endInd;
+	scanf("%c", &inputBuffer);
 	
+	//Grab file name user wants to save to 
+	printf("What is the name of the new file? (with .txt) "); 
+	fgets(userFileName, FILENAMECAP, stdin);
+					
+	for (int letter=0; userFileName[letter] != '\0'; letter++) {
+		endInd = letter;
+	}
+					
+	userFileName[endInd] = userFileName[endInd+1];
 	
+	//Write contents of array to file
+	outputFilePointer = fopen(userFileName, "w");
 	
+	for (int heightIndex=0; heightIndex<height; heightIndex++) {
+		for (int widthIndex=0; widthIndex<width+1; widthIndex++) {
+			fprintf(outputFilePointer, "%c", array[heightIndex][widthIndex]);
+		}
+	}
 	
-	
-	
-	//fclose(inputFilePointer);
+	fclose(outputFilePointer);
 }
 
 
