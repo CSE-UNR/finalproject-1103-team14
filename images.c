@@ -1,5 +1,5 @@
-// Verenice Acosta
-// Final Project
+// Names: Victor Dang, Verenice Acosta
+// Final Project: Image Processing
 
 #include <stdio.h>
 #include <stdbool.h>
